@@ -1,4 +1,4 @@
-## Dummy scrypt to send notification about new version deployment to a Slack channel
+## Dummy script to send notification about new version deployment to a Slack channel
 
 - no npm dependencies
 - use Slack incoming webhooks API to send a message
