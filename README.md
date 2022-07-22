@@ -37,12 +37,24 @@ Bitbucket pipeline example:
 ```yaml
 - step:
     name: Notify deploy
-    caches:
-      - node
+    image: node:16-alpine
     script:
-      - npm i --no-save git@bitbucket.org:omvmike/deploy-notify-slack.git#semver:latest
+      - apk add --no-cache bash git openssh
+      - npm i --no-save git@bitbucket.org:omvmike/deploy-notify-slack.git#semver:^0.1
       - VERSION=$(npm run version --silent)
       - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node ./node_modules/deploy-notify-slack/notify
+```
+or install package globally
+
+```yaml
+- step:
+    name: Notify Slack
+    image: node:16-alpine
+    script:
+      - apk add --no-cache bash git openssh
+      - npm i --location=global git@bitbucket.org:omvmike/deploy-notify-slack.git#semver:^0.1
+      - VERSION=$(npm run version --silent)
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node /usr/local/lib/node_modules/deploy-notify-slack/notify.js
 ```
 
 Full bitbucket CI/CD pipeline example for deploy NestJs application and send deploy message:
@@ -83,13 +95,13 @@ pipelines:
               ENVIRONMENT_NAME: $AWS_DEV_EB_ENV_NAME
               ZIP_FILE: "application.zip"
     - step:
-        name: Notify deploy
-        caches:
-          - node
+        name: Notify Slack
+        image: node:16-alpine
         script:
-          - npm i --no-save git@bitbucket.org:omvmike/deploy-notify-slack.git#semver:latest
+          - apk add --no-cache bash git openssh
+          - npm i --location=global git@bitbucket.org:omvmike/deploy-notify-slack.git#semver:^0.1
           - VERSION=$(npm run version --silent)
-          - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node ./node_modules/deploy-notify-slack/notify
+          - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node /usr/local/lib/node_modules/deploy-notify-slack/notify.js
   
 definitions:
   services:
