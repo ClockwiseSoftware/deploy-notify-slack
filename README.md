@@ -54,7 +54,8 @@ or install package globally
       - apk add --no-cache bash git openssh
       - npm i --location=global git@bitbucket.org:omvmike/deploy-notify-slack.git#semver:^0.1
       - VERSION=$(npm run version --silent)
-      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node /usr/local/lib/node_modules/deploy-notify-slack/notify.js
+      - PWD=$(pwd)
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION CHANGELOG_PATH=$PWD/changelog node /usr/local/lib/node_modules/deploy-notify-slack/notify.js
 ```
 
 Full bitbucket CI/CD pipeline example for deploy NestJs application and send deploy message:
