@@ -1,11 +1,12 @@
 {
   "name": "deploy-notify-slack",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Send Slack notification about deploy with version comments",
   "main": "notify.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "version": "echo $npm_package_version"
+    "version": "echo $npm_package_version",
+    "notify": "node notify.js"
   },
   "repository": {
     "type": "git",
