@@ -6,11 +6,11 @@ const slackWebHookURL = process.env.SLACK_WEBHOOK_URL;
 const stage = process.env.STAGE;
 const version = process.env.VERSION;
 const title = process.env.TITLE || 'Deployment';
-const changelogPath = process.env.CHANGELOG_PATH || 'changelog';
+const changelogPath = process.env.CHANGELOG_PATH || path.join(__dirname, '../../changelog');
 
 function getChangelog() {
   try {
-    return fs.readFileSync(path.join(__dirname, '../../', changelogPath, `${stage}-v${version}.md`), 'utf8')
+    return fs.readFileSync(path.join(changelogPath, `${stage}-v${version}.md`), 'utf8')
   } catch (e) {
     return '';
   }
