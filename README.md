@@ -37,7 +37,7 @@ Bitbucket pipeline example:
     script:
       - npm i git@bitbucket.org:omvmike/deploy-notify-slack.git#semver:latest
       - VERSION=$(npm run version --silent)
-      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node deploy/deploy-notify-slack.js
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node ./node_modules/deploy-notify-slack/notify
 ```
 
 Full bitbucket CI/CD pipeline example for deploy NestJs application and send deploy message:
@@ -84,7 +84,7 @@ pipelines:
         script:
           - npm i git@bitbucket.org:omvmike/deploy-notify-slack.git#semver:latest
           - VERSION=$(npm run version --silent)
-          - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node deploy/deploy-notify-slack.js
+          - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node ./node_modules/deploy-notify-slack/notify
   
 definitions:
   services:
