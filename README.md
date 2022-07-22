@@ -21,8 +21,13 @@
 
 - In Bitbucket pipeline or another place you wish to notify about just deployed version of your application you can add dev dependency
 ```shell
- npm i --save-dev git@bitbucket.org:omvmike/deploy-notify-slack.git#semver:latest
+ npm i --no-save git@bitbucket.org:omvmike/deploy-notify-slack.git#semver:latest
 ```
+or major version
+```shell
+ npm i --no-save git@bitbucket.org:omvmike/deploy-notify-slack.git#semver:^0.1
+```
+
 - run the scrypt with your env variables:
 ```shell
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/XXXXXXXXXXX STAGE=dev VERSION=1.0.0 node ./node_modules/deploy-notify-slack/notify
@@ -35,7 +40,7 @@ Bitbucket pipeline example:
     caches:
       - node
     script:
-      - npm i git@bitbucket.org:omvmike/deploy-notify-slack.git#semver:latest
+      - npm i --no-save git@bitbucket.org:omvmike/deploy-notify-slack.git#semver:latest
       - VERSION=$(npm run version --silent)
       - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node ./node_modules/deploy-notify-slack/notify
 ```
@@ -82,7 +87,7 @@ pipelines:
         caches:
           - node
         script:
-          - npm i git@bitbucket.org:omvmike/deploy-notify-slack.git#semver:latest
+          - npm i --no-save git@bitbucket.org:omvmike/deploy-notify-slack.git#semver:latest
           - VERSION=$(npm run version --silent)
           - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node ./node_modules/deploy-notify-slack/notify
   
