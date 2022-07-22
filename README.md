@@ -27,3 +27,72 @@
 ```shell
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/XXXXXXXXXXX STAGE=dev VERSION=1.0.0 node ./node_modules/deploy-notify-slack/notify
 ```
+
+Bitbucket pipeline example:
+```yaml
+- step:
+    name: Notify deploy
+    caches:
+      - node
+    script:
+      - npm i git@bitbucket.org:omvmike/deploy-notify-slack.git#semver:latest
+      - VERSION=$(npm run version --silent)
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node deploy/deploy-notify-slack.js
+```
+
+Full bitbucket CI/CD pipeline example for deploy NestJs application and send deploy message:
+```yaml
+image: atlassian/default-image:2
+clone:
+  depth: full
+pipelines:
+  default:
+    - step:
+        name: Test and Build
+        image: node:16-alpine
+        caches:
+          - node
+        script:
+          - npm ci
+          - npm run test:ci
+          - npm run build
+        services:
+          - database
+        artifacts:
+          - node_modules/**
+          - dist/**
+    - step:
+        name: Pack and deploy to bundle
+        script:
+          - VERSION=$(npm run version --silent)
+          - cp .env.static .env
+          - zip -r application.zip . -x "src/*" -x "docker/*" -x "test/*" -x "cloudformation/*"
+          - pipe: atlassian/aws-elasticbeanstalk-deploy:1.0.2
+            variables:
+              AWS_ACCESS_KEY_ID: $AWS_DEV_ACCESS_KEY_ID
+              AWS_SECRET_ACCESS_KEY: $AWS_DEV_SECRET_ACCESS_KEY
+              AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+              S3_BUCKET: $AWS_DEV_DEPLOY_BUCKET
+              VERSION_LABEL: "DEV-${VERSION}-${BITBUCKET_BUILD_NUMBER}-${BITBUCKET_COMMIT:0:8}"
+              APPLICATION_NAME: $AWS_DEV_APP_NAME
+              ENVIRONMENT_NAME: $AWS_DEV_EB_ENV_NAME
+              ZIP_FILE: "application.zip"
+    - step:
+        name: Notify deploy
+        caches:
+          - node
+        script:
+          - npm i git@bitbucket.org:omvmike/deploy-notify-slack.git#semver:latest
+          - VERSION=$(npm run version --silent)
+          - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node deploy/deploy-notify-slack.js
+  
+definitions:
+  services:
+    database:
+      image: postgres
+      user: postgres
+      variables:
+        POSTGRES_DB: test
+        POSTGRES_USER: api
+        POSTGRES_PASSWORD: example 
+```
