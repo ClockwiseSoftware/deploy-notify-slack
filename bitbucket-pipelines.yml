@@ -11,8 +11,8 @@ pipelines:
         name: Publish
         deployment: production
         script:
-          - npm version from-git -m "Upgrade to %s [skip ci]"
-          - git push && git push --tags
+#          - npm version from-git -m "Upgrade to %s [skip ci]"
+#          - git push && git push --tags
           - pipe: atlassian/npm-publish:0.2.0
             variables:
               NPM_TOKEN: $NPM_TOKEN
