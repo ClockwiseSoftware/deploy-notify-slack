@@ -12,8 +12,14 @@ function getChangelog() {
   try {
     return fs.readFileSync(path.join(changelogPath, `${stage}-v${version}.md`), 'utf8')
   } catch (e) {
-    return '';
+    console.log(`Description "${stage}-v${version}.md" not found`)
   }
+  try {
+    return fs.readFileSync(path.join(changelogPath, `v${version}.md`), 'utf8')
+  } catch (e) {
+    console.log(`Description "v${version}.md" not found`)
+  }
+  return '';
 }
 
 function notificationBody() {
