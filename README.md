@@ -13,7 +13,10 @@
 - CHANGELOG_PATH - path of your deployed version details file `changelog` by default.
 
 > version details file is a Markdown file having the name like `${STAGE}-v${VERSION}.md`. 
-> If such file isn't found details block will be omitted in Slack message.
+> 
+> you can also create cross-environment file with name pattern `v${VERSION}.md` and if script cannot find stage specific description it will get this one.
+> 
+> If no decription file found details block will be omitted in Slack message.
 
 ### How it works
 
