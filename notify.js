@@ -7,17 +7,20 @@ const stage = process.env.STAGE;
 const version = process.env.VERSION;
 const title = process.env.TITLE || 'Deployment';
 const changelogPath = process.env.CHANGELOG_PATH || path.join(__dirname, '../../changelog');
+const failsIfNotSent = process.env.FAILS_IF_NOT_SENT !== undefined
+  ? stringToBool(process.env.FAILS_IF_NOT_SENT, false)
+  : false;
 
 function getChangelog() {
   try {
     return fs.readFileSync(path.join(changelogPath, `${stage}-v${version}.md`), 'utf8')
   } catch (e) {
-    console.log(`Description "${stage}-v${version}.md" not found`)
+    console.log(`Description "${stage}-v${version}.md" not found in "${changelogPath}"`)
   }
   try {
     return fs.readFileSync(path.join(changelogPath, `v${version}.md`), 'utf8')
   } catch (e) {
-    console.log(`Description "v${version}.md" not found`)
+    console.log(`Description "v${version}.md" not found in "${changelogPath}"`)
   }
   return '';
 }
@@ -121,6 +124,24 @@ function sendSlackMessage (webhookURL, messageBody) {
   });
 }
 
+function stringToBool(str, defaultValue = false){
+  switch(str.toLowerCase().trim()){
+    case "true":
+    case "yes":
+    case "1":
+      return true;
+
+    case "false":
+    case "no":
+    case "0":
+    case null:
+      return false;
+
+    default:
+      return defaultValue
+  }
+}
+
 function validate() {
   let success = true;
   if (!slackWebHookURL) {
@@ -144,14 +165,23 @@ function validate() {
 // main
 (async function () {
   if (!validate()) {
-    process.exit(1);
+    process.exit(3);
   }
 
   console.log('Sending slack message');
   try {
     const slackResponse = await sendSlackMessage(slackWebHookURL, notificationBody());
     console.log('Message response', slackResponse);
+    if (slackResponse !== 'ok') {
+      console.error('There was an error with the request. Check SLACK_WEBHOOK_URL.');
+      if (failsIfNotSent) {
+        process.exit(4);
+      }
+    }
   } catch (e) {
-    console.error('There was a error with the request', e);
+    console.error('There was an error with the request', e);
+    if (failsIfNotSent) {
+      process.exit(5);
+    }
   }
 })();

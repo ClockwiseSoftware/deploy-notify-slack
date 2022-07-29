@@ -6,17 +6,24 @@
 
 ### ENV Variables
 
+#### Required
+
 - SLACK_WEBHOOK_URL - you should generate webhook url for your target channel, see: https://api.slack.com/messaging/webhooks
 - STAGE - name of an application stage you're deploying, usually: dev, staging, prod..
 - VERSION - deployed version
-- TITLE - notification title
-- CHANGELOG_PATH - path of your deployed version details file `changelog` by default.
+
+#### Optional
+
+- TITLE - ('Deployment' by default) notification title
+- CHANGELOG_PATH - path of your deployed version details file (`changelog` by default as well as we assume that the package installed locally, so this option is required if the package installed globally)
 
 > version details file is a Markdown file having the name like `${STAGE}-v${VERSION}.md`. 
 > 
 > you can also create cross-environment file with name pattern `v${VERSION}.md` and if script cannot find stage specific description it will get this one.
 > 
 > If no decription file found details block will be omitted in Slack message.
+
+- FAILS_IF_NOT_SENT - (false by default)  Should exit with not 0 error code if message was not sent successfully.
 
 ### How it works
 
