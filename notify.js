@@ -6,6 +6,7 @@ const slackWebHookURL = process.env.SLACK_WEBHOOK_URL;
 const stage = process.env.STAGE;
 const version = process.env.VERSION;
 const title = process.env.TITLE || 'Deployment';
+const customMessage = process.env.CUSTOM_MESSAGE;
 const changelogPath = process.env.CHANGELOG_PATH || path.join(__dirname, '../../changelog');
 const failsIfNotSent = process.env.FAILS_IF_NOT_SENT !== undefined
   ? stringToBool(process.env.FAILS_IF_NOT_SENT, false)
@@ -26,6 +27,11 @@ function getChangelog() {
 }
 
 function notificationBody() {
+  if (customMessage) {
+    return {
+      "attachments": [ JSON.parse(customMessage) ]
+    }
+  }
   let blocks = [
     {
       "type": "section",
@@ -144,6 +150,10 @@ function stringToBool(str, defaultValue = false){
 
 function validate() {
   let success = true;
+  if (customMessage) {
+    console.log('Custom message', customMessage);
+    return true;
+  }
   if (!slackWebHookURL) {
     console.error('Please fill in slack Webhook URL as SLACK_WEBHOOK_URL env');
     success = false;
@@ -167,7 +177,6 @@ function validate() {
   if (!validate()) {
     process.exit(3);
   }
-
   console.log('Sending slack message');
   try {
     const slackResponse = await sendSlackMessage(slackWebHookURL, notificationBody());

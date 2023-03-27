@@ -4,15 +4,16 @@
 - use Slack incoming webhooks API to send a message
 - can attach version description Markdown files
 
-### ENV Variables
+### Use default message template
+You can use default message template with the following env variables:
 
-#### Required
+#### Required env variables
 
 - SLACK_WEBHOOK_URL - you should generate webhook url for your target channel, see: https://api.slack.com/messaging/webhooks
 - STAGE - name of an application stage you're deploying, usually: dev, staging, prod..
 - VERSION - deployed version
 
-#### Optional
+#### Optional env variables
 
 - TITLE - ('Deployment' by default) notification title
 - CHANGELOG_PATH - path of your deployed version details file (`changelog` by default as well as we assume that the package installed locally, so this option is required if the package installed globally)
@@ -25,7 +26,7 @@
 
 - FAILS_IF_NOT_SENT - (false by default)  Should exit with not 0 error code if message was not sent successfully.
 
-### How it works
+#### How it works
 
 - Generate Slack webhook URL https://api.slack.com/messaging/webhooks
 
@@ -123,4 +124,36 @@ definitions:
         POSTGRES_DB: test
         POSTGRES_USER: api
         POSTGRES_PASSWORD: example 
+```
+
+### Use custom message template
+
+You can specify your own message template instead of default one.
+It's useful if you want to add some additional information to the message.
+
+Try to use [Slack message builder](https://api.slack.com/tools/block-kit-builder) to create your own message template.
+
+Then you should load your template from file and pass it to the script as env variable `CUSTOM_MESSAGE`:
+
+For example you saved your message template to `message.json` file:
+```json
+{
+  "blocks": [
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": ":flying_saucer: New API deploy of stage *DEV*",
+        "emoji": true
+      }
+    }
+  ]
+}
+```
+
+Then you can run the script with the following command:
+```shell
+npm i --location=global deploy-notify-slack@latest
+CUSTOM_MESSAGE=$(cat message.json)
+SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} CUSTOM_MESSAGE=$CUSTOM_MESSAGE node /usr/local/lib/node_modules/deploy-notify-slack/notify.js
 ```
