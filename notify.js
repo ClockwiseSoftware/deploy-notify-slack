@@ -57,6 +57,7 @@ function notificationBody() {
 
   const changelog = getChangelog();
   if (changelog) {
+    const changelogBlocks = splitTextToBlocks(changelog);
     blocks.push(
       {
         "type": "divider"
@@ -66,9 +67,20 @@ function notificationBody() {
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "*Description:* \n\n" + changelog
+        "text": "*Description:* \n\n" + changelogBlocks[0]
       }
     })
+    if (changelogBlocks.length > 1) {
+      for (let i = 1; i < changelogBlocks.length; i++) {
+        blocks.push({
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": changelogBlocks[i]
+          }
+        })
+      }
+    }
   }
   return {
     "attachments": [
@@ -128,6 +140,37 @@ function sendSlackMessage (webhookURL, messageBody) {
     req.write(messageBody);
     req.end();
   });
+}
+
+function splitTextToBlocks(text) {
+  let blocks = [];
+  let startIndex = 0;
+  let endIndex = 0;
+
+  const MAX_BLOCK_SIZE = 2500;
+  while (startIndex < text.length) {
+    endIndex = startIndex + MAX_BLOCK_SIZE;
+
+    // If the block does not end with a newline character, backtrack to the previous newline character.
+    if (endIndex < text.length && text[endIndex] !== '\n') {
+      while (endIndex > startIndex && text[endIndex] !== '\n') {
+        endIndex--;
+      }
+    }
+
+    // If end index is greater than text length, just take the rest of the text
+    if (endIndex > text.length) {
+      endIndex = text.length;
+    }
+
+    // Add the block to the array
+    blocks.push(text.substring(startIndex, endIndex));
+
+    // Move the start index to the next position, skipping the newline character
+    startIndex = endIndex + 1;
+  }
+
+  return blocks;
 }
 
 function stringToBool(str, defaultValue = false){
