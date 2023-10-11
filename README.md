@@ -17,6 +17,8 @@ You can use default message template with the following env variables:
 
 - TITLE - ('Deployment' by default) notification title
 - CHANGELOG_PATH - path of your deployed version details file (`changelog` by default as well as we assume that the package installed locally, so this option is required if the package installed globally)
+- COLOR - ('#7f8583' by default) left bar notification color. Should be hex color code without `#` symbol
+- EMOJI - (':rocket:' by default) emoji to be displayed in the notification title
 
 > version details file is a Markdown file having the name like `${STAGE}-v${VERSION}.md`. 
 > 

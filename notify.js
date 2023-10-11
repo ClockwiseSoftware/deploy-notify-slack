@@ -6,6 +6,8 @@ const slackWebHookURL = process.env.SLACK_WEBHOOK_URL;
 const stage = process.env.STAGE;
 const version = process.env.VERSION;
 const title = process.env.TITLE || 'Deployment';
+const color = process.env.COLOR || '7f8583';
+const emoji = process.env.EMOJI || ':rocket:';
 const customMessage = process.env.CUSTOM_MESSAGE;
 const changelogPath = process.env.CHANGELOG_PATH || path.join(__dirname, '../../changelog');
 const failsIfNotSent = process.env.FAILS_IF_NOT_SENT !== undefined
@@ -37,7 +39,7 @@ function notificationBody() {
       "type": "section",
       "text": {
           "type": "mrkdwn",
-          "text": `:rocket: *${title}*`
+          "text": `${emoji} *${title}*`
         }
     },
     {
@@ -85,6 +87,7 @@ function notificationBody() {
   return {
     "attachments": [
       {
+        "color": `#${color}`,
         "blocks": blocks
       }
     ]
