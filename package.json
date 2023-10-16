@@ -1,6 +1,6 @@
 {
   "name": "deploy-notify-slack",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Send Slack notification about deploy with version comments",
   "main": "notify.js",
   "scripts": {
@@ -10,12 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/omvmike/deploy-notify-slack.git"
+    "url": "git+ssh://git@github.com:ClockwiseSoftware/deploy-notify-slack.git"
   },
   "author": "mike.onofrienko@clockwise.software",
   "license": "MIT",
   "bugs": {
-    "url": "https://bitbucket.org/omvmike/deploy-notify-slack/issues"
+    "url": "https://github.com/ClockwiseSoftware/deploy-notify-slack/issues"
   },
-  "homepage": "https://bitbucket.org/omvmike/deploy-notify-slack#readme"
+  "homepage": "https://github.com/ClockwiseSoftware/deploy-notify-slack#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
 }
