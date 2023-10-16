@@ -1,6 +1,6 @@
 {
-  "name": "deploy-notify-slack",
-  "version": "0.5.1",
+  "name": "@ClockwiseSoftware/deploy-notify-slack",
+  "version": "0.5.2",
   "description": "Send Slack notification about deploy with version comments",
   "main": "notify.js",
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com:ClockwiseSoftware/deploy-notify-slack.git"
+    "url": "git+ssh://git@github.com/ClockwiseSoftware/deploy-notify-slack.git"
   },
   "author": "mike.onofrienko@clockwise.software",
   "license": "MIT",
