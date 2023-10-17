@@ -1,6 +1,6 @@
 {
-  "name": "@ClockwiseSoftware/deploy-notify-slack",
-  "version": "0.5.2",
+  "name": "@clockwisesoftware/deploy-notify-slack",
+  "version": "0.5.3",
   "description": "Send Slack notification about deploy with version comments",
   "main": "notify.js",
   "scripts": {
