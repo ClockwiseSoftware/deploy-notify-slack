@@ -27,8 +27,10 @@ jobs:
 #        env:
 #          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-      - name: Notify Slack
+      - name: Install package
         run: |
           VERSION=$(npm run version --silent)
           npm i --location=global deploy-notify-slack@$VERSION
-          SLACK_WEBHOOK_URL=${{secrets.SLACK_WEBHOOK_URL}} STAGE=production VERSION=$VERSION node /usr/local/lib/node_modules/@clockwisesoftware/deploy-notify-slack/notify.js
+
+      - name: Notify Slack
+        run: SLACK_WEBHOOK_URL=${{secrets.SLACK_WEBHOOK_URL}} STAGE=production VERSION=$VERSION FAILS_IF_NOT_SENT=true node /usr/local/lib/node_modules/@clockwisesoftware/deploy-notify-slack/notify.js
