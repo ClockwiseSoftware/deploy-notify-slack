@@ -2,31 +2,33 @@ name: Publish NPM Package
 
 on:
   push:
-    tags:
-      - '[0-9]+.[0-9]+.[0-9]+'
+#    tags:
+#      - '[0-9]+.[0-9]+.[0-9]+'
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out the code
-        uses: actions/checkout@v2
-
-      - name: Use Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '18'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@ClockwiseSoftware'
-
-#      - name: Install dependencies
-#        run: npm install
+#      - name: Check out the code
+#        uses: actions/checkout@v2
 #
-#      - name: Build package
-#        run: npm run build  # Remove this line if you don't have a build script
+#      - name: Use Node.js
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: '18'
+#          registry-url: 'https://npm.pkg.github.com'
+#          scope: '@ClockwiseSoftware'
+#
+#      - name: Publish package
+#        run: npm publish
+#        env:
+#          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-      - name: Publish package
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Notify Slack
+        run: |
+          VERSION=$(npm run version --silent)
+          npm i --location=global deploy-notify-slack@$VERSION
+          SLACK_WEBHOOK_URL=${{SLACK_WEBHOOK_URL}} STAGE=production VERSION=$VERSION node /usr/local/lib/node_modules/deploy-notify-slack/notify.js
