@@ -31,4 +31,4 @@ jobs:
         run: |
           VERSION=$(npm run version --silent)
           npm i --location=global deploy-notify-slack@$VERSION
-          SLACK_WEBHOOK_URL=${{secrets.SLACK_WEBHOOK_URL}} STAGE=production VERSION=$VERSION node /usr/local/lib/node_modules/deploy-notify-slack/notify.js
+          SLACK_WEBHOOK_URL=${{secrets.SLACK_WEBHOOK_URL}} STAGE=production VERSION=$VERSION node /usr/local/lib/node_modules/@clockwisesoftware/deploy-notify-slack/notify.js
