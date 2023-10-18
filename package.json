@@ -1,5 +1,5 @@
 {
-  "name": "@clockwisesoftware/deploy-notify-slack",
+  "name": "deploy-notify-slack",
   "version": "0.5.5",
   "private": false,
   "description": "Send Slack notification about deploy with version comments",
@@ -19,8 +19,7 @@
     "url": "https://github.com/ClockwiseSoftware/deploy-notify-slack/issues"
   },
   "homepage": "https://github.com/ClockwiseSoftware/deploy-notify-slack#readme",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/",
-    "access": "public"
+  "dependencies": {
+    "@clockwisesoftware/deploy-notify-slack": "^0.5.5"
   }
 }
