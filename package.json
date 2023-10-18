@@ -18,8 +18,5 @@
   "bugs": {
     "url": "https://github.com/ClockwiseSoftware/deploy-notify-slack/issues"
   },
-  "homepage": "https://github.com/ClockwiseSoftware/deploy-notify-slack#readme",
-  "dependencies": {
-    "@clockwisesoftware/deploy-notify-slack": "^0.5.5"
-  }
+  "homepage": "https://github.com/ClockwiseSoftware/deploy-notify-slack#readme"
 }
