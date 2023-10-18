@@ -22,16 +22,16 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
           scope: '@clockwisesoftware'
 
-      - name: add caompant to GitHub Package
-        run: |
-          # Update package.json for GitHub Packages
-          jq '.name = "@clockwisesoftware/deploy-notify-slack" | .publishConfig.registry = "https://npm.pkg.github.com/" | .publishConfig.access = "public"' package.json > package-temp.json
-          mv package-temp.json package.json
-
-      - name: Publish package
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+#      - name: add caompant to GitHub Package
+#        run: |
+#          # Update package.json for GitHub Packages
+#          jq '.name = "@clockwisesoftware/deploy-notify-slack" | .publishConfig.registry = "https://npm.pkg.github.com/" | .publishConfig.access = "public"' package.json > package-temp.json
+#          mv package-temp.json package.json
+#
+#      - name: Publish package
+#        run: npm publish
+#        env:
+#          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Install package
         run: npm i --location=global @clockwisesoftware/deploy-notify-slack@0.5.2
@@ -39,7 +39,8 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Notify Slack
-        run: VERSION=$(npm run version --silent) && SLACK_WEBHOOK_URL=${{secrets.SLACK_WEBHOOK_URL}} STAGE=production VERSION=$VERSION FAILS_IF_NOT_SENT=true node /usr/local/lib/node_modules/@clockwisesoftware/deploy-notify-slack/notify.js
+        run: npm list -g --depth=0
+#        run: VERSION=$(npm run version --silent) && SLACK_WEBHOOK_URL=${{secrets.SLACK_WEBHOOK_URL}} STAGE=production VERSION=$VERSION FAILS_IF_NOT_SENT=true node /usr/local/lib/node_modules/@clockwisesoftware/deploy-notify-slack/notify.js
 #  publish-npm:
 #    needs: build-and-test
 #    runs-on: ubuntu-latest
