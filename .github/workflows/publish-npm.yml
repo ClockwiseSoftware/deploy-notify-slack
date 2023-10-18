@@ -39,7 +39,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Notify Slack
-        run: VERSION=$(npm run version --silent) && SLACK_WEBHOOK_URL=${{secrets.SLACK_WEBHOOK_URL}} STAGE=production VERSION=$VERSION FAILS_IF_NOT_SENT=true node $(npm list -g @clockwisesoftware/deploy-notify-slack --parseable)/notify.js
+        run: VERSION=$(npm run version --silent) && SLACK_WEBHOOK_URL=${{secrets.SLACK_WEBHOOK_URL}} STAGE=staging TITLE="New version deployed to GitHub packages [package](https://github.com/ClockwiseSoftware/deploy-notify-slack/pkgs/npm/deploy-notify-slack)" VERSION=$VERSION FAILS_IF_NOT_SENT=true node $(npm list -g @clockwisesoftware/deploy-notify-slack --parseable)/notify.js
 
   publish-npm:
     runs-on: ubuntu-latest
@@ -53,3 +53,8 @@ jobs:
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+      - name: Install package
+        run: npm i --location=global deploy-notify-slack@$(npm run version --silent)
+
+      - name: Notify Slack
+        run: VERSION=$(npm run version --silent) && SLACK_WEBHOOK_URL=${{secrets.SLACK_WEBHOOK_URL}} STAGE=production TITLE="New version deployed to NPM [package](https://www.npmjs.com/package/deploy-notify-slack)" VERSION=$VERSION FAILS_IF_NOT_SENT=true node $(npm list -g deploy-notify-slack --parseable)/notify.js
