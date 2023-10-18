@@ -2,15 +2,15 @@ name: Publish NPM Package
 
 on:
   push:
-#    tags:
-#      - '[0-9]+.[0-9]+.[0-9]+'
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
     branches:
       - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     steps:
       - name: Check out the code
         uses: actions/checkout@v2
@@ -22,16 +22,16 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
           scope: '@clockwisesoftware'
 
-#      - name: add caompant to GitHub Package
-#        run: |
-#          # Update package.json for GitHub Packages
-#          jq '.name = "@clockwisesoftware/deploy-notify-slack" | .publishConfig.registry = "https://npm.pkg.github.com/" | .publishConfig.access = "public"' package.json > package-temp.json
-#          mv package-temp.json package.json
-#
-#      - name: Publish package
-#        run: npm publish
-#        env:
-#          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: add company prefix to GitHub Package
+        run: |
+          # Update package.json for GitHub Packages
+          jq '.name = "@clockwisesoftware/deploy-notify-slack" | .publishConfig.registry = "https://npm.pkg.github.com/" | .publishConfig.access = "public"' package.json > package-temp.json
+          mv package-temp.json package.json
+
+      - name: Publish package
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Install package
         run: npm i --location=global @clockwisesoftware/deploy-notify-slack@$(npm run version --silent)
@@ -40,17 +40,16 @@ jobs:
 
       - name: Notify Slack
         run: VERSION=$(npm run version --silent) && SLACK_WEBHOOK_URL=${{secrets.SLACK_WEBHOOK_URL}} STAGE=production VERSION=$VERSION FAILS_IF_NOT_SENT=true node $(npm list -g @clockwisesoftware/deploy-notify-slack --parseable)/notify.js
-#  publish-npm:
-#    needs: build-and-test
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#      - uses: actions/setup-node@v3
-#        with:
-#          node-version: 18
-#          registry-url: https://registry.npmjs.org/
-#      - run: npm ci
-#      - run: npm run build
-#      - run: npm publish
-#        env:
-#          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+  publish-npm:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: https://registry.npmjs.org/
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

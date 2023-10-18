@@ -17,8 +17,6 @@ You can use default message template with the following env variables:
 
 - TITLE - ('Deployment' by default) notification title
 - CHANGELOG_PATH - path of your deployed version details file (`changelog` by default as well as we assume that the package installed locally, so this option is required if the package installed globally)
-- COLOR - ('#7f8583' by default) left bar notification color. Should be hex color code without `#` symbol
-- EMOJI - (':rocket:' by default) emoji to be displayed in the notification title
 
 > version details file is a Markdown file having the name like `${STAGE}-v${VERSION}.md`. 
 > 
@@ -34,16 +32,16 @@ You can use default message template with the following env variables:
 
 - In Bitbucket pipeline or another place you wish to notify about just deployed version of your application you can add dev dependency
 ```shell
-npm i --no-save @clockwisesoftware/deploy-notify-slack
+npm i --no-save deploy-notify-slack@^0.5
 ```
 or major version
 ```shell
-npm i --location=global @clockwisesoftware/deploy-notify-slack
+npm i --location=global deploy-notify-slack@^0.5
 ```
 
 - run the scrypt with your env variables:
 ```shell
-SLACK_WEBHOOK_URL=https://hooks.slack.com/services/XXXXXXXXXXX STAGE=dev VERSION=1.0.0 node ./node_modules/@clockwisesoftware/deploy-notify-slack/notify
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/XXXXXXXXXXX STAGE=dev VERSION=1.0.0 node ./node_modules/deploy-notify-slack/notify
 ```
 
 Bitbucket pipeline example:
@@ -52,9 +50,9 @@ Bitbucket pipeline example:
     name: Notify deploy
     image: node:16-alpine
     script:
-      - npm i --location=global @clockwisesoftware/deploy-notify-slack@^0.3
+      - npm i --location=global deploy-notify-slack
       - VERSION=$(npm run version --silent)
-      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node ./node_modules/@clockwisesoftware/deploy-notify-slack/notify
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node ./node_modules/deploy-notify-slack/notify
 ```
 
 or install package globally
@@ -64,10 +62,10 @@ or install package globally
     name: Notify Slack
     image: node:16-alpine
     script:
-      - npm i --location=global @clockwisesoftware/deploy-notify-slack@^0.3
+      - npm i --location=global deploy-notify-slack
       - VERSION=$(npm run version --silent)
       - PWD=$(pwd)
-      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION CHANGELOG_PATH=$PWD/changelog node /usr/local/lib/node_modules/@clockwisesoftware/deploy-notify-slack/notify.js
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION CHANGELOG_PATH=$PWD/changelog node /usr/local/lib/node_modules/deploy-notify-slack/notify.js
 ```
 > version script above is just a `echo $npm_package_version` command
 
@@ -113,9 +111,9 @@ pipelines:
         name: Notify Slack
         image: node:16-alpine
         script:
-          - npm i --location=global @clockwisesoftware/deploy-notify-slack@^0.3
+          - npm i --location=global deploy-notify-slack
           - VERSION=$(npm run version --silent)
-          - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node /usr/local/lib/node_modules/@clockwisesoftware/deploy-notify-slack/notify.js
+          - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node /usr/local/lib/node_modules/deploy-notify-slack/notify.js
   
 definitions:
   services:
@@ -155,7 +153,7 @@ For example you saved your message template to `message.json` file:
 
 Then you can run the script with the following command:
 ```shell
-npm i --location=global @clockwisesoftware/deploy-notify-slack@latest
+npm i --location=global deploy-notify-slack@latest
 CUSTOM_MESSAGE=$(cat message.json)
-SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} CUSTOM_MESSAGE=$CUSTOM_MESSAGE node /usr/local/lib/node_modules/@clockwisesoftware/deploy-notify-slack/notify.js
+SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} CUSTOM_MESSAGE=$CUSTOM_MESSAGE node /usr/local/lib/node_modules/deploy-notify-slack/notify.js
 ```
