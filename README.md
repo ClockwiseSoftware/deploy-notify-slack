@@ -1,5 +1,8 @@
 ## Dummy script to send notification about new version deployment to a Slack channel
 
+<a href="https://www.npmjs.com/package/deploy-notify-slack" target="_blank"><img src="https://img.shields.io/npm/v/deploy-notify-slack" alt="NPM Version" /></a>
+<a href="https://www.npmjs.com/package/deploy-notify-slack" target="_blank"><img src="https://img.shields.io/npm/l/deploy-notify-slack" alt="Package License" /></a>
+
 - no npm dependencies, plain nodejs 8.x or higher
 - use Slack incoming webhooks API to send a message
 - can attach version description Markdown files
