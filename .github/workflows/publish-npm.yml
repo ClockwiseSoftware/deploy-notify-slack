@@ -34,7 +34,7 @@ jobs:
 #          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Install package
-        run: npm i --location=global @clockwisesoftware/deploy-notify-slack@0.5.2
+        run: npm i --location=global @clockwisesoftware/deploy-notify-slack@$(npm run version --silent)
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
