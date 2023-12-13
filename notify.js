@@ -1,6 +1,6 @@
 const https = require('https');
 const fs = require('fs');
-const path = require('path')
+const path = require('path');
 
 const slackWebHookURL = process.env.SLACK_WEBHOOK_URL;
 const stage = process.env.STAGE;
@@ -8,6 +8,8 @@ const version = process.env.VERSION;
 const title = process.env.TITLE || 'Deployment';
 const color = process.env.COLOR || '7f8583';
 const emoji = process.env.EMOJI || ':rocket:';
+const maxTextBlocksAvailable = process.env.MAX_BLOCKS || 5;
+
 const customMessage = process.env.CUSTOM_MESSAGE;
 const changelogPath = process.env.CHANGELOG_PATH || path.join(__dirname, '../../changelog');
 const failsIfNotSent = process.env.FAILS_IF_NOT_SENT !== undefined
@@ -16,14 +18,19 @@ const failsIfNotSent = process.env.FAILS_IF_NOT_SENT !== undefined
 
 function getChangelog() {
   try {
-    return fs.readFileSync(path.join(changelogPath, `${stage}-v${version}.md`), 'utf8')
+    return fs.readFileSync(path.join(changelogPath, `${stage}-v${version}.md`), 'utf8');
   } catch (e) {
-    console.log(`Description "${stage}-v${version}.md" not found in "${changelogPath}"`)
+    console.log(`Description "${stage}-v${version}.md" not found in "${changelogPath}"`);
   }
   try {
-    return fs.readFileSync(path.join(changelogPath, `v${version}.md`), 'utf8')
+    return fs.readFileSync(path.join(changelogPath, `v${version}.md`), 'utf8');
   } catch (e) {
-    console.log(`Description "v${version}.md" not found in "${changelogPath}"`)
+    console.log(`Description "v${version}.md" not found in "${changelogPath}"`);
+  }
+  try {
+    return fs.readFileSync(path.join(changelogPath, `changelog.md`), 'utf8');
+  } catch (e) {
+    console.log(`Description "changelog.md" not found in "${changelogPath}"`);
   }
   return '';
 }
@@ -31,30 +38,30 @@ function getChangelog() {
 function notificationBody() {
   if (customMessage) {
     return {
-      "attachments": [ JSON.parse(customMessage) ]
-    }
+      'attachments': [JSON.parse(customMessage)],
+    };
   }
   let blocks = [
     {
-      "type": "section",
-      "text": {
-          "type": "mrkdwn",
-          "text": `${emoji} *${title}*`
-        }
+      'type': 'section',
+      'text': {
+        'type': 'mrkdwn',
+        'text': `${emoji} *${title}*`,
+      },
     },
     {
-      "type": "section",
-      "fields": [
+      'type': 'section',
+      'fields': [
         {
-          "type": "mrkdwn",
-          "text": `*stage*\n ${stage}`
+          'type': 'mrkdwn',
+          'text': `*stage*\n ${stage}`,
         },
         {
-          "type": "mrkdwn",
-          "text": `*version*\n ${version}`
-        }
-      ]
-    }
+          'type': 'mrkdwn',
+          'text': `*version*\n ${version}`,
+        },
+      ],
+    },
   ];
 
   const changelog = getChangelog();
@@ -62,35 +69,35 @@ function notificationBody() {
     const changelogBlocks = splitTextToBlocks(changelog);
     blocks.push(
       {
-        "type": "divider"
-      }
+        'type': 'divider',
+      },
     );
     blocks.push({
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "*Description:* \n\n" + changelogBlocks[0]
-      }
-    })
+      'type': 'section',
+      'text': {
+        'type': 'mrkdwn',
+        'text': '*Description:* \n\n' + changelogBlocks[0],
+      },
+    });
     if (changelogBlocks.length > 1) {
       for (let i = 1; i < changelogBlocks.length; i++) {
         blocks.push({
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": changelogBlocks[i]
-          }
-        })
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': changelogBlocks[i],
+          },
+        });
       }
     }
   }
   return {
-    "attachments": [
+    'attachments': [
       {
-        "color": `#${color}`,
-        "blocks": blocks
-      }
-    ]
+        'color': `#${color}`,
+        'blocks': blocks,
+      },
+    ],
   };
 }
 
@@ -101,7 +108,7 @@ function notificationBody() {
  * @param messageBody
  * @return {Promise}
  */
-function sendSlackMessage (webhookURL, messageBody) {
+function sendSlackMessage(webhookURL, messageBody) {
   // make sure the incoming message body can be parsed into valid JSON
   try {
     messageBody = JSON.stringify(messageBody);
@@ -115,14 +122,13 @@ function sendSlackMessage (webhookURL, messageBody) {
     const requestOptions = {
       method: 'POST',
       header: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     };
 
     // actual request
     const req = https.request(webhookURL, requestOptions, (res) => {
       let response = '';
-
 
       res.on('data', (d) => {
         response += d;
@@ -131,7 +137,7 @@ function sendSlackMessage (webhookURL, messageBody) {
       // response finished, resolve the promise with data
       res.on('end', () => {
         resolve(response);
-      })
+      });
     });
 
     // there was an error, reject the promise
@@ -151,23 +157,26 @@ function splitTextToBlocks(text) {
   let endIndex = 0;
 
   const MAX_BLOCK_SIZE = 2500;
-  while (startIndex < text.length) {
+  const MAX_SYMBOLS_AVAILABLE = MAX_BLOCK_SIZE * maxTextBlocksAvailable;
+  const croppedText = text.length > MAX_SYMBOLS_AVAILABLE ? text.substring(0, MAX_SYMBOLS_AVAILABLE) + '...' : text;
+
+  while (startIndex < croppedText.length) {
     endIndex = startIndex + MAX_BLOCK_SIZE;
 
     // If the block does not end with a newline character, backtrack to the previous newline character.
-    if (endIndex < text.length && text[endIndex] !== '\n') {
-      while (endIndex > startIndex && text[endIndex] !== '\n') {
+    if (endIndex < croppedText.length && croppedText[endIndex] !== '\n') {
+      while (endIndex > startIndex && croppedText[endIndex] !== '\n') {
         endIndex--;
       }
     }
 
     // If end index is greater than text length, just take the rest of the text
-    if (endIndex > text.length) {
-      endIndex = text.length;
+    if (endIndex > croppedText.length) {
+      endIndex = croppedText.length;
     }
 
     // Add the block to the array
-    blocks.push(text.substring(startIndex, endIndex));
+    blocks.push(croppedText.substring(startIndex, endIndex));
 
     // Move the start index to the next position, skipping the newline character
     startIndex = endIndex + 1;
@@ -176,21 +185,21 @@ function splitTextToBlocks(text) {
   return blocks;
 }
 
-function stringToBool(str, defaultValue = false){
-  switch(str.toLowerCase().trim()){
-    case "true":
-    case "yes":
-    case "1":
+function stringToBool(str, defaultValue = false) {
+  switch (str.toLowerCase().trim()) {
+    case 'true':
+    case 'yes':
+    case '1':
       return true;
 
-    case "false":
-    case "no":
-    case "0":
+    case 'false':
+    case 'no':
+    case '0':
     case null:
       return false;
 
     default:
-      return defaultValue
+      return defaultValue;
   }
 }
 
@@ -219,7 +228,7 @@ function validate() {
 }
 
 // main
-(async function () {
+(async function() {
   if (!validate()) {
     process.exit(3);
   }
