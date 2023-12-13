@@ -1,5 +1,8 @@
 ## Dummy script to send notification about new version deployment to a Slack channel
 
+<a href="https://www.npmjs.com/package/deploy-notify-slack" target="_blank"><img src="https://img.shields.io/npm/v/deploy-notify-slack" alt="NPM Version" /></a>
+<a href="https://www.npmjs.com/package/deploy-notify-slack" target="_blank"><img src="https://img.shields.io/npm/l/deploy-notify-slack" alt="Package License" /></a>
+
 - no npm dependencies, plain nodejs 8.x or higher
 - use Slack incoming webhooks API to send a message
 - can attach version description Markdown files
@@ -35,11 +38,11 @@ You can use default message template with the following env variables:
 
 - In Bitbucket pipeline or another place you wish to notify about just deployed version of your application you can add dev dependency
 ```shell
-npm i --no-save deploy-notify-slack@^0.3
+npm i --no-save deploy-notify-slack@^0.5
 ```
 or major version
 ```shell
-npm i --location=global deploy-notify-slack@^0.3
+npm i --location=global deploy-notify-slack@^0.5
 ```
 
 - run the scrypt with your env variables:
@@ -53,7 +56,7 @@ Bitbucket pipeline example:
     name: Notify deploy
     image: node:16-alpine
     script:
-      - npm i --location=global deploy-notify-slack@^0.3
+      - npm i --location=global deploy-notify-slack
       - VERSION=$(npm run version --silent)
       - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node ./node_modules/deploy-notify-slack/notify
 ```
@@ -65,7 +68,7 @@ or install package globally
     name: Notify Slack
     image: node:16-alpine
     script:
-      - npm i --location=global deploy-notify-slack@^0.3
+      - npm i --location=global deploy-notify-slack
       - VERSION=$(npm run version --silent)
       - PWD=$(pwd)
       - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION CHANGELOG_PATH=$PWD/changelog node /usr/local/lib/node_modules/deploy-notify-slack/notify.js
@@ -114,7 +117,7 @@ pipelines:
         name: Notify Slack
         image: node:16-alpine
         script:
-          - npm i --location=global deploy-notify-slack@^0.3
+          - npm i --location=global deploy-notify-slack
           - VERSION=$(npm run version --silent)
           - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node /usr/local/lib/node_modules/deploy-notify-slack/notify.js
   
