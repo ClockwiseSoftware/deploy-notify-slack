@@ -1,6 +1,6 @@
 {
   "name": "deploy-notify-slack",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Send Slack notification about deploy with version comments",
   "main": "notify.js",
   "scripts": {
