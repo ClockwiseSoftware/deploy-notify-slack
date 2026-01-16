@@ -50,7 +50,10 @@ npx deploy-notify-slack
 **Local install (recommended for CI/CD):**
 ```bash
 npm install --save-dev deploy-notify-slack
+# Run with npx:
 npx deploy-notify-slack
+# Or run with node:
+node ./node_modules/deploy-notify-slack/notify.js
 ```
 
 **Global install:**
@@ -107,7 +110,7 @@ If no changelog file is found, the notification is sent without a changelog atta
 
 > The `version` script above is `echo $npm_package_version` in package.json
 
-**Local install (caches better in CI):**
+**Using node (local install):**
 ```yaml
 - step:
     name: Notify Slack
@@ -115,7 +118,7 @@ If no changelog file is found, the notification is sent without a changelog atta
     script:
       - npm install --no-save deploy-notify-slack@^0.6
       - VERSION=$(npm run version --silent)
-      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION CHANGELOG_PATH=$PWD/changelog npx deploy-notify-slack
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node ./node_modules/deploy-notify-slack/notify.js
 ```
 
 **Full pipeline example (NestJS + AWS Elastic Beanstalk):**
@@ -198,7 +201,10 @@ Use the [Slack Block Kit Builder](https://api.slack.com/tools/block-kit-builder)
 **Usage:**
 ```bash
 CUSTOM_MESSAGE=$(cat message.json)
+# With npx:
 SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} CUSTOM_MESSAGE=$CUSTOM_MESSAGE npx deploy-notify-slack
+# Or with node:
+SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} CUSTOM_MESSAGE=$CUSTOM_MESSAGE node ./node_modules/deploy-notify-slack/notify.js
 ```
 
 ## License
