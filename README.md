@@ -3,7 +3,10 @@
 <a href="https://www.npmjs.com/package/deploy-notify-slack" target="_blank"><img src="https://img.shields.io/npm/v/deploy-notify-slack" alt="NPM Version" /></a>
 <a href="https://www.npmjs.com/package/deploy-notify-slack" target="_blank"><img src="https://img.shields.io/npm/l/deploy-notify-slack" alt="Package License" /></a>
 
-- no npm dependencies, plain nodejs 8.x or higher
+> **Note:** [Version 0.5.10](https://www.npmjs.com/package/deploy-notify-slack/v/0.5.10) is the last release supporting Node.js 8.x.
+> Version 0.6.0+ requires Node.js 21 or higher.
+
+- no npm dependencies, requires Node.js 21 or higher
 - use Slack incoming webhooks API to send a message
 - can attach version description Markdown files
 
@@ -38,11 +41,11 @@ You can use default message template with the following env variables:
 
 - In Bitbucket pipeline or another place you wish to notify about just deployed version of your application you can add dev dependency
 ```shell
-npm i --no-save deploy-notify-slack@^0.5
+npm i --no-save deploy-notify-slack@^0.6
 ```
 or major version
 ```shell
-npm i --location=global deploy-notify-slack@^0.5
+npm i --location=global deploy-notify-slack@^0.6
 ```
 
 - run the scrypt with your env variables:
@@ -54,7 +57,7 @@ Bitbucket pipeline example:
 ```yaml
 - step:
     name: Notify deploy
-    image: node:16-alpine
+    image: node:24-alpine
     script:
       - npm i --location=global deploy-notify-slack
       - VERSION=$(npm run version --silent)
@@ -66,7 +69,7 @@ or install package globally
 ```yaml
 - step:
     name: Notify Slack
-    image: node:16-alpine
+    image: node:24-alpine
     script:
       - npm i --location=global deploy-notify-slack
       - VERSION=$(npm run version --silent)
@@ -85,7 +88,7 @@ pipelines:
   default:
     - step:
         name: Test and Build
-        image: node:16-alpine
+        image: node:24-alpine
         caches:
           - node
         script:
@@ -115,7 +118,7 @@ pipelines:
               ZIP_FILE: "application.zip"
     - step:
         name: Notify Slack
-        image: node:16-alpine
+        image: node:24-alpine
         script:
           - npm i --location=global deploy-notify-slack
           - VERSION=$(npm run version --silent)
