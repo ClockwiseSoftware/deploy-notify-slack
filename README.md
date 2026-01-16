@@ -1,85 +1,124 @@
-## Dummy script to send notification about new version deployment to a Slack channel
+# deploy-notify-slack
 
 <a href="https://www.npmjs.com/package/deploy-notify-slack" target="_blank"><img src="https://img.shields.io/npm/v/deploy-notify-slack" alt="NPM Version" /></a>
 <a href="https://www.npmjs.com/package/deploy-notify-slack" target="_blank"><img src="https://img.shields.io/npm/l/deploy-notify-slack" alt="Package License" /></a>
 
-> **Note:** [Version 0.5.10](https://www.npmjs.com/package/deploy-notify-slack/v/0.5.10) is the last release supporting Node.js 8.x.
-> Version 0.6.0+ requires Node.js 21 or higher.
+Send Slack notifications about deployments via incoming webhooks.
 
-- no npm dependencies, requires Node.js 21 or higher
-- use Slack incoming webhooks API to send a message
-- can attach version description Markdown files
+## Features
 
-### Use default message template
-You can use default message template with the following env variables:
+- Zero dependencies - uses native Node.js `fetch()` API
+- Automatic changelog attachment from Markdown files
+- Customizable colors, emojis, and titles
+- Full custom message support via Slack Block Kit
+- Simple environment variable configuration
 
-#### Required env variables
+## Requirements
 
-- SLACK_WEBHOOK_URL - you should generate webhook url for your target channel, see: https://api.slack.com/messaging/webhooks
-- STAGE - name of an application stage you're deploying, usually: dev, staging, prod..
-- VERSION - deployed version
+- **Node.js 21+** (uses native `fetch()` API)
 
-#### Optional env variables
+> Need Node.js 8.x-20.x support? Use [v0.5.10](https://www.npmjs.com/package/deploy-notify-slack/v/0.5.10)
 
-- TITLE - ('Deployment' by default) notification title
-- CHANGELOG_PATH - path of your deployed version details file (`changelog` by default as well as we assume that the package installed locally, so this option is required if the package installed globally)
-- COLOR - ('#7f8583' by default) left bar notification color. Should be hex color code without `#` symbol
-- EMOJI - (':rocket:' by default) emoji to be displayed in the notification title
-- MAX_BLOCKS - (5 by default) maximum amount of large blocks(2500 symbols) available in slack message. If your changelog is bigger than this value it will be truncated.
+## Quick Start
 
-> version details file is a Markdown file having the name like `${STAGE}-v${VERSION}.md`. 
-> 
-> you can also create cross-environment file with name pattern `v${VERSION}.md` and if script cannot find stage specific description it will get this one.
-> 
-> If no description file found details block will be omitted in Slack message.
+1. Generate a [Slack Webhook URL](https://api.slack.com/messaging/webhooks)
 
-- FAILS_IF_NOT_SENT - (false by default)  Should exit with not 0 error code if message was not sent successfully.
+2. Run with npx (no installation required):
+   ```bash
+   SLACK_WEBHOOK_URL=https://hooks.slack.com/services/XXX \
+   STAGE=production \
+   VERSION=1.0.0 \
+   npx deploy-notify-slack
+   ```
 
-#### How it works
+   Or install and run with node:
+   ```bash
+   npm install deploy-notify-slack
+   SLACK_WEBHOOK_URL=https://hooks.slack.com/services/XXX \
+   STAGE=production \
+   VERSION=1.0.0 \
+   node ./node_modules/deploy-notify-slack/notify.js
+   ```
 
-- Generate Slack webhook URL https://api.slack.com/messaging/webhooks
+## Installation
 
-- In Bitbucket pipeline or another place you wish to notify about just deployed version of your application you can add dev dependency
-```shell
-npm i --no-save deploy-notify-slack@^0.6
-```
-or major version
-```shell
-npm i --location=global deploy-notify-slack@^0.6
-```
-
-- run the scrypt with your env variables:
-```shell
-SLACK_WEBHOOK_URL=https://hooks.slack.com/services/XXXXXXXXXXX STAGE=dev VERSION=1.0.0 node ./node_modules/deploy-notify-slack/notify
+**npx (no install required):**
+```bash
+npx deploy-notify-slack
 ```
 
-Bitbucket pipeline example:
-```yaml
-- step:
-    name: Notify deploy
-    image: node:24-alpine
-    script:
-      - npm i --location=global deploy-notify-slack
-      - VERSION=$(npm run version --silent)
-      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node ./node_modules/deploy-notify-slack/notify
+**Local install (recommended for CI/CD):**
+```bash
+npm install --save-dev deploy-notify-slack
+npx deploy-notify-slack
 ```
 
-or install package globally
+**Global install:**
+```bash
+npm install --location=global deploy-notify-slack
+deploy-notify-slack
+```
 
+## Configuration
+
+### Required Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `SLACK_WEBHOOK_URL` | Webhook URL for your Slack channel ([how to generate](https://api.slack.com/messaging/webhooks)) |
+| `STAGE` | Deployment stage (e.g., `dev`, `staging`, `prod`) |
+| `VERSION` | Version being deployed |
+
+### Optional Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `TITLE` | `Deployment` | Notification title |
+| `COLOR` | `7f8583` | Left bar color (hex without `#`) |
+| `EMOJI` | `:rocket:` | Title emoji |
+| `MAX_BLOCKS` | `5` | Max 2500-char blocks before truncation |
+| `CHANGELOG_PATH` | `./changelog` | Path to changelog directory |
+| `FAILS_IF_NOT_SENT` | `false` | Exit with error if send fails |
+| `CUSTOM_MESSAGE` | - | JSON for custom Slack Block Kit message |
+
+### Changelog File Resolution
+
+The script looks for changelog files in the following order:
+
+1. `{CHANGELOG_PATH}/{STAGE}-v{VERSION}.md` (stage-specific, e.g., `prod-v1.0.0.md`)
+2. `{CHANGELOG_PATH}/v{VERSION}.md` (version-specific, e.g., `v1.0.0.md`)
+3. `{CHANGELOG_PATH}/changelog.md` (fallback)
+
+If no changelog file is found, the notification is sent without a changelog attachment.
+
+## CI/CD Integration
+
+### Bitbucket Pipelines
+
+**Using npx (recommended):**
 ```yaml
 - step:
     name: Notify Slack
     image: node:24-alpine
     script:
-      - npm i --location=global deploy-notify-slack
       - VERSION=$(npm run version --silent)
-      - PWD=$(pwd)
-      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION CHANGELOG_PATH=$PWD/changelog node /usr/local/lib/node_modules/deploy-notify-slack/notify.js
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION CHANGELOG_PATH=$PWD/changelog npx deploy-notify-slack@^0.6
 ```
-> version script above is just a `echo $npm_package_version` command
 
+> The `version` script above is `echo $npm_package_version` in package.json
 
-Full bitbucket CI/CD pipeline example for deploy NestJs application and send deploy message:
+**Local install (caches better in CI):**
+```yaml
+- step:
+    name: Notify Slack
+    image: node:24-alpine
+    script:
+      - npm install --no-save deploy-notify-slack@^0.6
+      - VERSION=$(npm run version --silent)
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION CHANGELOG_PATH=$PWD/changelog npx deploy-notify-slack
+```
+
+**Full pipeline example (NestJS + AWS Elastic Beanstalk):**
 ```yaml
 image: atlassian/default-image:2
 clone:
@@ -120,10 +159,9 @@ pipelines:
         name: Notify Slack
         image: node:24-alpine
         script:
-          - npm i --location=global deploy-notify-slack
           - VERSION=$(npm run version --silent)
-          - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION node /usr/local/lib/node_modules/deploy-notify-slack/notify.js
-  
+          - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} STAGE=dev VERSION=$VERSION CHANGELOG_PATH=$PWD/changelog npx deploy-notify-slack@^0.6
+
 definitions:
   services:
     database:
@@ -132,19 +170,16 @@ definitions:
       variables:
         POSTGRES_DB: test
         POSTGRES_USER: api
-        POSTGRES_PASSWORD: example 
+        POSTGRES_PASSWORD: example
 ```
 
-### Use custom message template
+## Custom Messages
 
-You can specify your own message template instead of default one.
-It's useful if you want to add some additional information to the message.
+You can specify your own message template instead of the default one using the `CUSTOM_MESSAGE` environment variable.
 
-Try to use [Slack message builder](https://api.slack.com/tools/block-kit-builder) to create your own message template.
+Use the [Slack Block Kit Builder](https://api.slack.com/tools/block-kit-builder) to design your message, then pass it as JSON:
 
-Then you should load your template from file and pass it to the script as env variable `CUSTOM_MESSAGE`:
-
-For example you saved your message template to `message.json` file:
+**Example message.json:**
 ```json
 {
   "blocks": [
@@ -160,9 +195,12 @@ For example you saved your message template to `message.json` file:
 }
 ```
 
-Then you can run the script with the following command:
-```shell
-npm i --location=global deploy-notify-slack@latest
+**Usage:**
+```bash
 CUSTOM_MESSAGE=$(cat message.json)
-SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} CUSTOM_MESSAGE=$CUSTOM_MESSAGE node /usr/local/lib/node_modules/deploy-notify-slack/notify.js
+SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL} CUSTOM_MESSAGE=$CUSTOM_MESSAGE npx deploy-notify-slack
 ```
+
+## License
+
+MIT
