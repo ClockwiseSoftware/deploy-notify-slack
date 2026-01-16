@@ -55,7 +55,8 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org/
-      - run: npm publish --provenance --access public
+      - name: Publish to npm with OIDC
+        run: npm publish --access public
       - name: Install package
         run: npm i --location=global deploy-notify-slack@$(npm run version --silent)
 
